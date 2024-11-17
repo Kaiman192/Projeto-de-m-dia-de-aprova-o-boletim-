@@ -1,0 +1,65 @@
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+*.env
+*.venv
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Pytest
+.cache/
+
+# Logs
+*.log
+
+# Virtual environments
+*.virtualenv
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Configurations
+*.ini
+*.cfg
+
+# VSCode files
+.vscode/
+
+# PyCharm
+.idea/
+
+# Miscellaneous
+*.bak
+*.swp
+*.tmp
+*.~*
+
+# Files created during package builds
+*.egg
+*.egg-info/
+dist/
+build/
+*.manifest
+*.spec
+
+# Output files
+*.out
+*.lock
+
+# Python wheels
+*.whl

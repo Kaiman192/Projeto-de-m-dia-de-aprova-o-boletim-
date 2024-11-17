@@ -1,0 +1,135 @@
+import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
+
+# Função para calcular a nota necessária no terceiro trimestre
+def calcular_media_necessaria():
+    try:
+        nota1 = float(entry_nota1.get())
+        nota2 = float(entry_nota2.get())
+        if nota1 < 0 or nota1 > 10 or nota2 < 0 or nota2 > 10:
+            messagebox.showerror("Erro", "As notas devem estar entre 0 e 10.")
+            return
+
+        media_necessaria = 6.0
+        nota_terceiro = (media_necessaria * 3) - (nota1 + nota2)
+
+        if nota_terceiro <= 10:
+            if nota_terceiro <= 0:
+                label_resultado.config(
+                    text=f"Você já está aprovado! Para a aprovação, você precisa tirar no mínimo {nota_terceiro:.1f} no terceiro trimestre."
+                )
+            else:
+                label_resultado.config(
+                    text=f"Para aprovação, você precisa tirar no mínimo {nota_terceiro:.1f} no terceiro trimestre."
+                )
+        else:
+            label_resultado.config(text="A média necessária para aprovação não pode ser alcançada.")
+    except ValueError:
+        messagebox.showerror("Erro", "Por favor, insira apenas valores numéricos válidos.")
+
+# Função para atualizar o boletim com notas arredondadas, calcular a média e verificar aprovação
+def atualizar_boletim():
+    boletim_texto.delete("1.0", tk.END)
+    notas = []
+    for materia, entry in materia_entries.items():
+        try:
+            nota = float(entry.get())
+            if 0 <= nota <= 10:
+                notas.append(nota)
+                boletim_texto.insert(tk.END, f"{materia}: {round(nota, 1):.1f}\n")
+            elif entry.get() != "":
+                boletim_texto.insert(tk.END, f"{materia}: Nota inválida\n")
+        except ValueError:
+            if entry.get() != "":
+                boletim_texto.insert(tk.END, f"{materia}: Nota inválida\n")
+
+    # Calcula a média final e verifica aprovação
+    if notas:
+        media_final = sum(notas) / len(notas)
+        boletim_texto.insert(tk.END, f"\nMédia Final: {round(media_final, 1):.1f}\n")
+
+        if media_final >= 6:
+            boletim_texto.insert(tk.END, "Status: Aprovado ✅")
+        else:
+            boletim_texto.insert(tk.END, "Status: Reprovado ❌")
+    else:
+        boletim_texto.insert(tk.END, "\nMédia Final: N/A\nStatus: Dados insuficientes.")
+
+# Função para calcular a média arredondada (manual, já atualizada no boletim)
+def calcular_media_arredondada():
+    try:
+        notas = []
+        for entry in materia_entries.values():
+            nota = float(entry.get())
+            if 0 <= nota <= 10:
+                notas.append(nota)
+            else:
+                messagebox.showerror("Erro", "As notas devem estar entre 0 e 10.")
+                return
+
+        if not notas:
+            messagebox.showinfo("Média Arredondada", "Nenhuma nota válida inserida.")
+            return
+
+        media = sum(notas) / len(notas)
+        media_arredondada = round(media, 1)
+        messagebox.showinfo("Média Arredondada", f"A média arredondada das notas é: {media_arredondada:.1f}")
+    except ValueError:
+        messagebox.showerror("Erro", "Por favor, insira apenas valores numéricos válidos.")
+
+# Função para criar a interface
+def criar_interface():
+    global entry_nota1, entry_nota2, label_resultado, materia_entries, boletim_texto
+
+    root = tk.Tk()
+    root.title("Sistema de Notas e Boletim")
+
+    notebook = ttk.Notebook(root)
+
+    # Aba Cálculo de Notas
+    aba_notas = ttk.Frame(notebook)
+    notebook.add(aba_notas, text="Cálculo de Notas")
+
+    ttk.Label(aba_notas, text="Primeiro Trimestre:").grid(row=0, column=0, padx=10, pady=5)
+    entry_nota1 = ttk.Entry(aba_notas)
+    entry_nota1.grid(row=0, column=1, padx=10, pady=5)
+
+    ttk.Label(aba_notas, text="Segundo Trimestre:").grid(row=1, column=0, padx=10, pady=5)
+    entry_nota2 = ttk.Entry(aba_notas)
+    entry_nota2.grid(row=1, column=1, padx=10, pady=5)
+
+    btn_calcular = ttk.Button(aba_notas, text="Calcular Nota Necessária", command=calcular_media_necessaria)
+    btn_calcular.grid(row=2, column=0, columnspan=2, pady=10)
+
+    label_resultado = ttk.Label(aba_notas, text="")
+    label_resultado.grid(row=3, column=0, columnspan=2, pady=5)
+
+    # Aba Notas Gerais
+    aba_calculo = ttk.Frame(notebook)
+    notebook.add(aba_calculo, text="Notas Gerais")
+
+    materias = ["Matemática", "Português", "História", "Ciências", "Geografia"]
+    materia_entries = {}
+    for i, materia in enumerate(materias):
+        ttk.Label(aba_calculo, text=f"{materia}:").grid(row=i, column=0, padx=10, pady=5)
+        entry = ttk.Entry(aba_calculo)
+        entry.grid(row=i, column=1, padx=10, pady=5)
+        entry.bind("<KeyRelease>", lambda e: atualizar_boletim())  # Atualiza o boletim ao digitar
+        materia_entries[materia] = entry
+
+    btn_media_arredondada = ttk.Button(aba_calculo, text="Calcular Média Arredondada", command=calcular_media_arredondada)
+    btn_media_arredondada.grid(row=len(materias), column=0, columnspan=2, pady=10)
+
+    # Aba Boletim
+    aba_boletim = ttk.Frame(notebook)
+    notebook.add(aba_boletim, text="Boletim")
+
+    boletim_texto = tk.Text(aba_boletim, height=15, width=40)
+    boletim_texto.grid(row=0, column=0, padx=10, pady=10)
+
+    notebook.pack(expand=True, fill="both")
+
+    root.mainloop()
+
+criar_interface()
